@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<!-- python .\scripts\tools\compress_videos.py --data_root "C:\Users\56295\OneDrive - xudenden\418\Long Volumetric Video\Long Volumetric Video Materials\videos" --videos_dir demo --output_dir demo_x0.5 --vcodec libx264 --pix_fmt yuv420p --tag "" --preset "" --crf 28 --resize 0.5 -->
+<html lang="en">
+
+<head>
+    <meta content="4D Gaussian Transformer" name="title" />
+    <meta content="We propose a scalable 4D dynamic reconstruction model trained only on real-world monocular RGB videos." name="description" />
+    <meta content="Image Based Rendering, Computer Vision, Computer Graphics, NeRF, 3D Gaussian Splatting, Novel View Synthesis, Freeviewpoint Video" name="keywords" />
+    <meta content="index, follow" name="robots" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="English" name="language" />
+    <meta content="Zhen Xu" name="author" />
+    <title>4D Gaussian Transformer</title>
+    <!-- Bootstrap -->
+    <script src="js/video_comparison.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap-4.4.1.js"></script>
+
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/brands.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/solid.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" rel="stylesheet" />
+    <link rel="icon" href="img/favicon.svg">
+
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        code {
+            white-space: pre-wrap;
+        }
+
+        body {
+            font-family: 'Jost';
+            font-weight: 500;
+            font-size: 1.25em;
+        }
+
+        h1 {
+            font-size: 2.25em;
+        }
+
+        h2 {
+            font-size: 1.75em;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: bolder;
+        }
+
+        b {
+            font-weight: bolder;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        section>h5 {
+            padding-bottom: 30px;
+        }
+
+        .col-12>h3 {
+            padding-top: 30px;
+        }
+
+        .results-section {
+            padding-bottom: 30px;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .carousel-control-prev {
+            left: 25px;
+        }
+
+        .carousel-control-next {
+            right: 25px;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            bottom: 10%;
+            left: 90%;
+
+            /* Adjust vertical position */
+            text-align: center;
+            /* Center the content horizontally */
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .carousel-indicators li {
+            background-color: transparent;
+            /* Hide the default Bootstrap indicators */
+            border: none;
+            /* Remove border */
+            margin: 0 25px;
+            display: inline-block;
+        }
+
+        .indicator-dot {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            text-indent: -999px;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .row.sm-gutters {
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .row.sm-gutters>.col-md-4 {
+            padding-right: 5px;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .row.sm-gutters>.col-md-6 {
+            padding-right: 5px;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .row.sm-gutters>.col-md-12 {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+        .zoom-element {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .zoom-element:hover {
+            transform: scale(1.25);
+        }
+
+        video,
+        iframe {
+            border-radius: 10px;
+            padding: 0px;
+            margin: 0px;
+
+            :focus {
+                outline: none;
+            }
+        }
+
+        .comparison-canvas {
+            border-radius: 10px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .a16x9 {
+            aspect-ratio: 16/9;
+        }
+
+        .a4x3 {
+            aspect-ratio: 4/3;
+        }
+
+        .a1x1 {
+            aspect-ratio: 1;
+        }
+
+        .a085 {
+            aspect-ratio: 1430/1678;
+        }
+
+        .a133 {
+            aspect-ratio: 1352/1014;
+        }
+
+        .a1875 {
+            aspect-ratio: 1920/1024;
+        }
+
+        .a32 {
+            aspect-ratio: 3/2;
+        }
+
+        .a42 {
+            aspect-ratio: 2352 / 560;
+        }
+
+        .a43 {
+            aspect-ratio: 1680 / 392;
+        }
+    </style>
+    <script>
+
+    </script>
+    </link>
+</head>
+
+<body>
+    <!-- cover -->
+    <section>
+        <div class="jumbotron text-center mt-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 style="font-weight: bold; font-size: 2.0em">
+                            <span style="font-size: 1.4em; font-weight:800; color: #6c6c6c">4DGT</span>
+                            <br />
+                            Learning a <span style="color: #c68b5b">4D Gaussian Transformer</span>
+                            <br />
+                            Using <span style="color: #6589bf">Real-World Monocular Videos</span>
+                        </h1>
+                        <!-- <h4 style="color:#5a6268; font-weight: bold;">SIGGRAPH Asia 2024 (TOG)</h4> -->
+                        <hr>
+                        <a href="https://zhenx.me" target="_blank">Zhen Xu<sup>1,2,*</sup></a>
+                        <a href="https://sites.google.com/view/zhengqinli" target="_blank">Zhengqin Li<sup>1</sup></a>
+                        <a href="https://flycooler.com/" target="_blank">Zhao Dong<sup>1</sup></a>
+                        <a href="https://xzhou.me" target="_blank">Xiaowei Zhou<sup>2</sup></a>
+                        <a href="https://rapiderobot.bitbucket.io/" target="_blank">Richard Newcombe<sup>1</sup></a>
+                        <a href="https://lvzhaoyang.github.io/" target="_blank">Zhaoyang Lv<sup>1</sup></a>
+                        </a>
+                        <p>
+                            <sup>1</sup>Reality Labs Research, Meta&nbsp;&nbsp;&nbsp;&nbsp;<sup>2</sup>Zhejiang University
+                            <br />
+                            <span style="color: #5a6268; font-size: 0.9em">
+                                <sup>*</sup>Work done during internship at Meta.&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        </p>
+                        <div class="row justify-content-center">
+
+                            <div class="column">
+                                <p class="mb-5">
+                                    <a class="btn btn-large btn-light" href="https://arxiv.org/abs/2412.09608" role="button" target="_blank">
+                                        <i class="ai ai-arxiv"></i>
+                                        <b>arXiv</b>
+                                    </a>
+                                </p>
+                            </div>
+
+                            <div class="column">
+                                <p class="mb-5">
+                                    <a class="btn btn-large btn-light" href="https://4dgt.github.io" role="button" target="_blank">
+                                        <i class="fa fa-github"></i>
+                                        <b>Code (Coming Soon)</b>
+                                    </a>
+                                </p>
+                            </div>
+
+                            <!-- <div class="column">
+                                <p class="mb-5">
+                                    <a class="btn btn-large btn-light" href="https://4dgt.github.io" role="button" target="_blank">
+                                        <span class="icon">🤗</span>
+                                        <b>Demo (Coming Soon)</b>
+                                    </a>
+                                </p>
+                            </div> -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 text-center">
+                    <b style="color: #8899a5">
+                        Trained on monocular videos only, our model learns to perform feed-forward 4D reconstruction in seconds.
+                    </b>
+
+                    <div class="row sm-gutters zoom-element" style="z-index: 100; position: relative">
+                        <div class="col-md-12">
+                            <video autoplay class="a16x9" data-desktop-vid1="vid/4dgt_teaser.mp4" data-desktop-vid2="vid/4dgt_teaser.mp4" data-mobile-vid1="vid/4dgt_teaser_x0.5.mp4" data-mobile-vid2="vid/4dgt_teaser_x0.5.mp4" loop muted playsinline poster="img/spinner.svg" width="100%" style="border-radius: 1.1em">
+                            </video>
+                        </div>
+                    </div>
+
+
+                    <b style="color: #8899a5">
+                        Reconstruction results on the <i><b><a href="https://ego-exo4d-data.org/" target="_blank">Ego-Exo4D</a></b></i> and <i><b><a href="https://www.projectaria.com/datasets/aea/" target="_blank">AEA</a></b></i> Dataset (concatenated full sequences)
+                    </b>
+
+                    <div class="carousel slide" data-interval="100000" data-ride="carousel" id="comp-carousel" style="z-index: 1;">
+                        <ol class="carousel-indicators">
+                            <li class="active" data-slide-to="0" data-target="#comp-carousel">
+                                <span class="indicator-dot"></span>
+                            </li>
+                            <li data-slide-to="1" data-target="#comp-carousel">
+                                <span class="indicator-dot"></span>
+                            </li>
+                            <li data-slide-to="2" data-target="#comp-carousel">
+                                <span class="indicator-dot"></span>
+                            </li>
+                            <li data-slide-to="3" data-target="#comp-carousel">
+                                <span class="indicator-dot"></span>
+                            </li>
+                            <!-- Additional indicators... -->
+                        </ol>
+                        <div class="carousel-inner">
+
+                            <div class="carousel-item active">
+                                <div class="row sm-gutters">
+                                    <div class="col-md-12">
+                                        <video autoplay class="a16x9" data-desktop-vid1="vid/bike.mp4" data-desktop-vid2="vid/bike.mp4" data-mobile-vid1="vid/bike_x0.5.mp4" data-mobile-vid2="vid/bike_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" width="100%">
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="carousel-item">
+                                <div class="row sm-gutters">
+                                    <div class="col-md-12">
+                                        <video class="a16x9" data-desktop-vid1="vid/cooking.mp4" data-desktop-vid2="vid/cooking.mp4" data-mobile-vid1="vid/cooking_x0.5.mp4" data-mobile-vid2="vid/cooking_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" width="100%">
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="carousel-item">
+                                <div class="row sm-gutters">
+                                    <div class="col-md-12">
+                                        <video class="a16x9" data-desktop-vid1="vid/bouldering.mp4" data-desktop-vid2="vid/bouldering.mp4" data-mobile-vid1="vid/bouldering_x0.5.mp4" data-mobile-vid2="vid/bouldering_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" width="100%">
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional carousel items... -->
+                        </div>
+                        <a class="carousel-control-prev" data-slide="prev" href="#comp-carousel" role="button">
+                            <span aria-hidden="true" class="carousel-control-prev-icon"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" data-slide="next" href="#comp-carousel" role="button">
+                            <span aria-hidden="true" class="carousel-control-next-icon"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+
+                    <div class="col-12">
+                        <p style="text-align: justify; text-justify: inter-word;">
+                            We propose <span style="font-weight:800; color: #6c6c6c">4DGT</span>, a <b style="color: #c68b5b">4D Gaussian-based Transformer model</b> for dynamic scene reconstruction, trained entirely on <b style="color: #6589bf">real-world monocular posed videos</b>. Using 4D Gaussian as an inductive bias, <span style="font-weight:800; color: #6c6c6c">4DGT</span> unifies static and dynamic components, enabling the modeling of complex, time-varying environments with varying object lifespans. We proposed a novel density control strategy in training which enables our <span style="font-weight:800; color: #6c6c6c">4DGT</span> to handle longer space-time input and remain efficient rendering at runtime. Our model processes 64 consecutive posed frames in a rolling-window fashion, predicting consistent 4D Gaussians in the scene. <b>Unlike optimization-based methods, <span style="font-weight:800; color: #6c6c6c">4DGT</span> performs purely feed-forward inference, reducing reconstruction time from hours to seconds and scaling effectively to long video sequences.</b>
+                            Trained only on large-scale monocular posed video datasets, <span style="font-weight:800; color: #6c6c6c">4DGT</span> can outperform prior Gaussian-based networks significantly in real-world videos and achieve on-par accuracy with optimization-based methods on cross-domain videos.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Method</h3>
+                    <hr style="margin-top: 0px" />
+                    <img src="img/pipeline.jpg" width="100%" />
+                    <br />
+                    <br />
+                    <p style="text-align: justify; text-justify: inter-word;">
+                        <!-- An overview of our method in training and rendering. -->
+                        <span style="font-weight:800; color: #6c6c6c">4DGT</span> takes a series of monocular frames with poses as input.
+                        During training, we subsample the temporal frames at different granularity and use all images for supervision.
+                        We first train <span style="font-weight:800; color: #6c6c6c">4DGT</span> to predict pixel-aligned Gaussians at coarse resolution in stage one.
+                        In stage two training, we pruned a majority of non-activated Gaussians according to the histograms of per-patch activation channels, and densify the Gaussian prediction by increasing the input token samples in both space and time.
+                        At inference time, we run the <span style="font-weight:800; color: #6c6c6c">4DGT</span> network trained after stage two.
+                        It can support dense video frames input at high resolution.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3>More Results</h3>
+                    <hr style="margin-top: 0px" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="results-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5>
+                        <button aria-controls="aria-demos" aria-expanded="false" class="btn btn-primary" data-target="#aria-demos" data-toggle="collapse" id="aria-demos-button" type="button">
+                            &nbsp;Click to Expand&nbsp;
+                        </button>
+                        More Results on the <i><b><a href="https://www.projectaria.com/datasets/adt/" target="_blank">ADT</a></b></i>, <i><b><a href="https://www.projectaria.com/datasets/hot3D/" target="_blank">HOT3D</a></b></i> and <i><b><a href="https://www.projectaria.com/datasets/nymeria//" target="_blank">Nymeria</a></b></i> Dataset
+                    </h5>
+                </div>
+            </div>
+            <div class="collapse" id="aria-demos">
+                <div class="col-md-12">
+                    <div class="row sm-gutters">
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/bowl.mp4" data-desktop-vid2="vid/bowl.mp4" data-mobile-vid1="vid/bowl_x0.5.mp4" data-mobile-vid2="vid/bowl_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/dlbook.mp4" data-desktop-vid2="vid/dlbook.mp4" data-mobile-vid1="vid/dlbook_x0.5.mp4" data-mobile-vid2="vid/dlbook_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/house.mp4" data-desktop-vid2="vid/house.mp4" data-mobile-vid1="vid/house_x0.5.mp4" data-mobile-vid2="vid/house_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/shuffle.mp4" data-desktop-vid2="vid/shuffle.mp4" data-mobile-vid1="vid/shuffle_x0.5.mp4" data-mobile-vid2="vid/shuffle_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/ceiling.mp4" data-desktop-vid2="vid/ceiling.mp4" data-mobile-vid1="vid/ceiling_x0.5.mp4" data-mobile-vid2="vid/ceiling_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                        <div class="col-md-6 zoom-element">
+                            <video class="a32" data-desktop-vid1="vid/off.mp4" data-desktop-vid2="vid/off.mp4" data-mobile-vid1="vid/off_x0.5.mp4" data-mobile-vid2="vid/off_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+
+
+    <section class="results-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5>
+                        <button aria-controls="nonaria-demos" aria-expanded="false" class="btn btn-primary" data-target="#nonaria-demos" data-toggle="collapse" id="nonaria-demos-button" type="button">
+                            &nbsp;Click to Expand&nbsp;
+                        </button>
+                        More Results on the <i><b><a href="https://kair-bair.github.io/dycheck/" target="_blank">DyCheck</a></b></i> and <i><b><a href="https://cvg.cit.tum.de/data/datasets/rgbd-dataset" target="_blank">TUM Dynamics</a></b></i> Dataset
+                    </h5>
+                </div>
+            </div>
+            <div class="collapse" id="nonaria-demos">
+                <div class="col-md-12">
+                    <div class="row sm-gutters">
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a42" data-desktop-vid1="vid/apple.mp4" data-desktop-vid2="vid/apple.mp4" data-mobile-vid1="vid/apple_x0.5.mp4" data-mobile-vid2="vid/apple_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a42" data-desktop-vid1="vid/space-out.mp4" data-desktop-vid2="vid/space-out.mp4" data-mobile-vid1="vid/space-out_x0.5.mp4" data-mobile-vid2="vid/space-out_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a42" data-desktop-vid1="vid/block.mp4" data-desktop-vid2="vid/block.mp4" data-mobile-vid1="vid/block_x0.5.mp4" data-mobile-vid2="vid/block_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a42" data-desktop-vid1="vid/spin.mp4" data-desktop-vid2="vid/spin.mp4" data-mobile-vid1="vid/spin_x0.5.mp4" data-mobile-vid2="vid/spin_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a43" data-desktop-vid1="vid/desk.mp4" data-desktop-vid2="vid/desk.mp4" data-mobile-vid1="vid/desk_x0.5.mp4" data-mobile-vid2="vid/desk_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a43" data-desktop-vid1="vid/grab.mp4" data-desktop-vid2="vid/grab.mp4" data-mobile-vid1="vid/grab_x0.5.mp4" data-mobile-vid2="vid/grab_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Baseline Comparisons & Ablations</h3>
+                    <hr style="margin-top: 0px" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5>
+                        <button aria-controls="comparisons" aria-expanded="false" class="btn btn-primary" data-target="#comparisons" data-toggle="collapse" id="comparisons-button" type="button">
+                            &nbsp;Click to Expand&nbsp;
+                        </button>
+                        Comparisons with <b><a href="https://research.nvidia.com/labs/toronto-ai/l4gm/" target="_blank">L4GM</a></b>, <b><a href="https://shape-of-motion.github.io/" target="_blank">Shape-of-Motion</a></b> and <b><a href="https://sai-bi.github.io/project/gs-lrm/" target="_blank">StaticLRM</a></b>
+                    </h5>
+                </div>
+            </div>
+            <div class="collapse" id="comparisons">
+                <div class="col-md-12">
+                    <div class="row sm-gutters">
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a16x9" data-desktop-vid1="vid/comp0.mp4" data-desktop-vid2="vid/comp0.mp4" data-mobile-vid1="vid/comp0_x0.5.mp4" data-mobile-vid2="vid/comp0_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a16x9" data-desktop-vid1="vid/comp1.mp4" data-desktop-vid2="vid/comp1.mp4" data-mobile-vid1="vid/comp1_x0.5.mp4" data-mobile-vid2="vid/comp1_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a16x9" data-desktop-vid1="vid/comp2.mp4" data-desktop-vid2="vid/comp2.mp4" data-mobile-vid1="vid/comp2_x0.5.mp4" data-mobile-vid2="vid/comp2_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5>
+                        <button aria-controls="ablations" aria-expanded="false" class="btn btn-primary" data-target="#ablations" data-toggle="collapse" id="ablations-button" type="button">
+                            &nbsp;Click to Expand&nbsp;
+                        </button>
+                        Ablations studies of the proposed components
+                    </h5>
+                </div>
+            </div>
+            <div class="collapse" id="ablations">
+                <div class="col-md-12">
+                    <div class="row sm-gutters">
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a16x9" data-desktop-vid1="vid/abl0.mp4" data-desktop-vid2="vid/abl0.mp4" data-mobile-vid1="vid/abl0_x0.5.mp4" data-mobile-vid2="vid/abl0_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                        <div class="col-md-12 zoom-element">
+                            <video class="a16x9" data-desktop-vid1="vid/abl1.mp4" data-desktop-vid2="vid/abl1.mp4" data-mobile-vid1="vid/abl1_x0.5.mp4" data-mobile-vid2="vid/abl1_x0.5.mp4" loop muted playsinline controls aria-controls poster="img/spinner.svg" preload="none" width="100%">
+                            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- citing -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                </br>
+                </br>
+                <h3>Citation</h3>
+                <hr style="margin-top: 0px" />
+                <pre style="background-color: #e9eeef; padding: 1.5em 1.5em; border-radius: 20px; font-size: 0.75em;">
+<code>@inproceedings{xu20254dgt
+    title     = {4DGT: Learning a 4D Gaussian Transformer Using Real-World Monocular Videos},
+    author    = {Xu, Zhen and Li, Zhengqin and Dong, Zhao and Zhou, Xiaowei and Newcombe, Richard and Lv, Zhaoyang},
+    journal   = {arXiv preprint arXiv:xxxx.xxxxx},
+    year      = {2025}
+}</code></pre>
+                <hr />
+            </div>
+        </div>
+    </div>
+
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <footer style="margin-bottom: 10px">
+                        Thanks to
+                        <a href="https://zhenx.me/" target="_blank">Zhen Xu</a>
+                        for the website template, which can be found
+                        <a href="https://github.com/zju3dv/zju3dv.github.io/tree/master/longvolcap" target="_blank">here</a>.
+                        <br />
+                        Thanks to <a href="https://aljazbozic.github.io/" target="_blank">Aljaz Bozic</a> for the insightful discussions.
+                        <br />
+                        Thanks to the <a href="https://www.projectaria.com/" target="_blank">Project Aria</a> team for their open-source and dataset contributions.
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Default Statcounter code for <span style="font-weight:800; color: #6c6c6c">4DGT</span>: 4D Gaussian
+Transformer https://4dgt.github.io -->
+    <script type="text/javascript">
+        var sc_project = 13142206;
+        var sc_invisible = 1;
+        var sc_security = "d39080b0"; 
+    </script>
+    <script type="text/javascript" src="https://www.statcounter.com/counter/counter.js" async></script>
+    <noscript>
+        <div class="statcounter"><a title="Web Analytics" href="https://statcounter.com/" target="_blank"><img class="statcounter" src="https://c.statcounter.com/13142206/0/d39080b0/1/" alt="Web Analytics" referrerPolicy="no-referrer-when-downgrade"></a></div>
+    </noscript>
+    <!-- End of Statcounter Code -->
+    <script>
+        var buttonIds = [
+            'aria-demos-button',
+            'nonaria-demos-button',
+            'comparisons-button',
+            'ablations-button',
+      /* ...other button ids... */];
+        var sectionIds = [
+            'aria-demos',
+            'nonaria-demos',
+            'comparisons',
+            'ablations',
+     /* ...other section ids... */];
+        for (var i = 0; i < buttonIds.length; i++) {
+            (function (index) {
+                var button = document.getElementById(buttonIds[index]);
+                var section = document.getElementById(sectionIds[index]);
+                button.addEventListener('click', function () {
+                    if (section.classList.contains('show')) {
+                        button.innerText = '\u00a0Click to Expand\u00a0';
+                        var videos = section.getElementsByTagName('video');
+                        for (var j = 0; j < videos.length; j++) {
+                            if (videos[j].readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                                videos[j].pause();
+                            }
+                        }
+                    } else {
+                        button.innerText = 'Click to Collapse';
+                        var videos = section.getElementsByTagName('video');
+                        for (var j = 0; j < videos.length; j++) {
+                            videos[j].play();
+                        }
+                    }
+                });
+            })(i);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$", right: "$", display: false },
+                    { left: "$$", right: "$$", display: true }
+                ]
+            });
+        });
+
+
+        function handleCarouselSlide(event) {
+            // Reference to the current carousel
+            var currentCarousel = $(event.target);
+
+            // Check each video in the current carousel
+            currentCarousel.find('video').each(function () {
+                var isVideoInActiveItem = $(this).closest('.carousel-item').hasClass('active');
+                if (isVideoInActiveItem) {
+                    if (this.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                        this.height = (this.videoHeight / this.videoWidth) * $(this).parent().width();
+                    }
+                    this.play();
+                } else {
+                    if (this.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                        this.pause();
+                    }
+                }
+            });
+        }
+
+        $('.carousel').on('slid.bs.carousel', handleCarouselSlide);
+
+        $(document).ready(function () {
+            $('video').each(function () {
+                var $video = $(this);
+                var $carousel = $video.closest('.carousel');
+                if ($carousel.length > 0) {
+                    $video.on('ended', function () {
+                        $carousel.carousel('next');
+                    });
+                }
+            });
+        });
+
+        function updateVideoShape() {
+            this.height = (this.videoHeight / this.videoWidth) * $(this).parent().width();
+        }
+
+        // fix the element's width and height properties to the current video ones
+        $("video").each(function () {
+            if (!this.classList.contains('comparison-video')) {
+                $(this).on('loadeddata', updateVideoShape);
+            }
+        });
+
+        // $("#renbody-results-button").click()
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get all videos
+            var videos = document.querySelectorAll('video');
+
+            // Add source to video tag
+            function addSourceToVideo(element, src) {
+                var source = document.createElement('source');
+                source.src = src;
+                source.type = 'video/mp4';
+                element.appendChild(source);
+            }
+
+            // Determine screen size and select appropriate videos
+            function whichSizeVideo(element) {
+                var windowWidth = window.innerWidth || window.innerWidth;
+                var prefix = windowWidth > 1200 ? "desktop" : "mobile";
+
+                // Get all data attributes for the given prefix (e.g., data-mobile-_x0.5vid1, data-mobile-vid2, ...)
+                var i = 1;
+                while (element.dataset[prefix + "Vid" + i]) {
+                    addSourceToVideo(element, element.dataset[prefix + "Vid" + i]);
+                    i++;
+                }
+            }
+
+            // Initialize only if the page has videos
+            function videoBandwidth() {
+                if (videos) {
+                    videos.forEach(whichSizeVideo);
+                }
+            }
+            videoBandwidth();
+
+            // FIXME: this is not working yet
+            function videoSize() {
+                if (videos) {
+                    videos.forEach(updateVideoShape);
+                }
+            }
+            // Listen to window resize
+            window.onresize = videoSize;
+
+            setInterval(function () {
+                // Select all comparison-video type videos
+                let videos = document.querySelectorAll('.comparison-video');
+
+                videos.forEach(video => {
+                    // If the id does not end with After
+                    if (!video.id.endsWith('After')) {
+                        resizeAndPlay(video);
+                    }
+                });
+            }, 10000);  // 每500毫秒检测一次
+
+        });
+    </script>
+</body>
+
+</html>
